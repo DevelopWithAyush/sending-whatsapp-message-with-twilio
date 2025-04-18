@@ -13,13 +13,29 @@ const PORT = process.env.PORT || 5000;
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Connect to MongoDB
-mongoose.connect(process.env.MONGO_URI)
-    .then(() => console.log('Connected to MongoDB'))
-    .catch(err => {
-        console.error('MongoDB connection error:', err);
+// MongoDB connection with optimized settings for serverless environment
+const connectDB = async () => {
+    try {
+        const conn = await mongoose.connect(process.env.MONGO_URI, {
+            // These options help with serverless deployments
+            // by optimizing connection handling
+            useNewUrlParser: true,
+            useUnifiedTopology: true,
+            bufferCommands: false,
+            serverSelectionTimeoutMS: 5000,
+            socketTimeoutMS: 45000,
+        });
+        console.log(`MongoDB Connected: ${conn.connection.host}`);
+        return conn;
+    } catch (error) {
+        console.error(`Error connecting to MongoDB: ${error.message}`);
         process.exit(1);
-    });
+    }
+};
+
+// Only connect to MongoDB when handling a request
+// This approach is better for serverless environments
+let cachedConnection = null;
 
 // Set up Swagger docs
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
@@ -34,7 +50,13 @@ app.get('/', (req, res) => {
 });
 
 // API routes
-app.use('/api/v1/auth', authRoutes);
+app.use('/api/v1/auth', async (req, res, next) => {
+    // Connect to MongoDB if not already connected
+    if (!cachedConnection) {
+        cachedConnection = await connectDB();
+    }
+    next();
+}, authRoutes);
 
 // Handle 404 routes
 app.use('*', (req, res) => {
@@ -55,8 +77,17 @@ app.use((err, req, res, next) => {
     });
 });
 
+// Connect to MongoDB in local environment
+// In production/Vercel, we'll connect on request
+if (process.env.NODE_ENV !== 'production') {
+    connectDB();
+}
+
 // Start the server
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
     console.log(`API Documentation available at http://localhost:${PORT}/api-docs`);
-}); 
+});
+
+// For Vercel serverless deployment
+export default app; 

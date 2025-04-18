@@ -131,6 +131,50 @@ POST /api/v1/auth/verify-otp
 4. Get your Account SID and Auth Token from the Twilio dashboard
 5. Add these credentials to your .env file
 
+## 🚀 Deploying to Vercel
+
+This application is configured for easy deployment on Vercel. Follow these steps:
+
+1. **Install Vercel CLI** (optional)
+
+   ```
+   npm install -g vercel
+   ```
+
+2. **Connect your MongoDB Atlas**
+
+   - Sign up for a free [MongoDB Atlas](https://www.mongodb.com/cloud/atlas) account
+   - Create a cluster and get your connection string
+   - Replace the MONGO_URI in your environment variables with this connection string
+
+3. **Deploy using Vercel CLI**
+
+   ```
+   vercel
+   ```
+
+   Or connect your GitHub repository to Vercel for automatic deployments.
+
+4. **Set Environment Variables in Vercel**
+
+   - Go to your project settings in Vercel dashboard
+   - Add the following environment variables:
+     - `MONGO_URI` - Your MongoDB Atlas connection string
+     - `TWILIO_ACCOUNT_SID` - Your Twilio Account SID
+     - `TWILIO_AUTH_TOKEN` - Your Twilio Auth Token
+     - `TWILIO_WHATSAPP_NUMBER` - Your Twilio WhatsApp number (with whatsapp: prefix)
+     - `OTP_EXPIRY_MINUTES` - How long OTPs should remain valid (default: 5)
+
+5. **Redeployment**
+
+   - Vercel will automatically redeploy when you push changes to your connected repository
+   - Or run `vercel` again from your local project
+
+6. **Important Considerations for Serverless Deployment**
+   - The app is optimized for serverless environments
+   - MongoDB connections are handled efficiently to work within Vercel's constraints
+   - Swagger documentation will be available at `<your-vercel-url>/api-docs`
+
 ## 📋 License
 
 This project is licensed under the MIT License - see the LICENSE file for details.
