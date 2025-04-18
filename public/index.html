@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WhatsApp OTP Verification</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
+            padding-top: 2rem;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .card {
+            border-radius: 15px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            border: none;
+            margin-bottom: 20px;
+        }
+
+        .card-header {
+            background-color: #25D366;
+            color: white;
+            border-radius: 15px 15px 0 0 !important;
+            font-weight: 600;
+        }
+
+        .form-control {
+            border-radius: 8px;
+            padding: 10px 15px;
+            margin-bottom: 15px;
+        }
+
+        .btn-primary {
+            background-color: #25D366;
+            border: none;
+            border-radius: 8px;
+            padding: 10px 20px;
+        }
+
+        .btn-primary:hover {
+            background-color: #128C7E;
+        }
+
+        .alert {
+            border-radius: 8px;
+        }
+
+        .logo {
+            max-width: 60px;
+            margin-right: 15px;
+        }
+
+        .header-container {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .app-title {
+            margin: 0;
+            font-size: 24px;
+            font-weight: 700;
+            color: #128C7E;
+        }
+
+        .app-subtitle {
+            margin: 0;
+            font-size: 14px;
+            color: #666;
+        }
+
+        #resendBtn {
+            display: none;
+            color: #25D366;
+            text-decoration: none;
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+        #resendBtn:hover {
+            color: #128C7E;
+        }
+
+        .otp-input-group {
+            display: flex;
+            gap: 8px;
+            margin: 20px 0;
+        }
+
+        .otp-input {
+            width: 50px;
+            height: 50px;
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+            border: 1px solid #ced4da;
+            border-radius: 8px;
+        }
+
+        #countdownTimer {
+            font-weight: 600;
+            color: #dc3545;
+        }
+
+        .loading-spinner {
+            display: none;
+            width: 1.5rem;
+            height: 1.5rem;
+            margin-right: 0.5rem;
+            animation: spinner-border 0.75s linear infinite;
+            border: 0.2em solid currentColor;
+            border-right-color: transparent;
+            border-radius: 50%;
+        }
+
+        .divider {
+            display: flex;
+            align-items: center;
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .divider::before,
+        .divider::after {
+            content: '';
+            flex: 1;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .divider::before {
+            margin-right: 10px;
+        }
+
+        .divider::after {
+            margin-left: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header-container">
+            <svg class="logo" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#25D366">
+                <path
+                    d="M19.11 17.205c-.372 0-1.088 1.39-1.518 1.39a.63.63 0 0 1-.315-.1c-.802-.402-1.504-.817-2.163-1.447-.545-.516-1.146-1.29-1.46-1.963a.426.426 0 0 1-.073-.215c0-.33.99-.945.99-1.49 0-.143-.73-.143-.176-.143-.302 0-.573.097-.746.282-.174.186-.257.4-.257.655 0 .31.087.618.256.927.17.31.395.617.66.817.264.2.487.3.914.523.43.223.73.324 1.104.471.374.146.746.293 1.032.293a1.85 1.85 0 0 0 .871-.23c.43-.26.664-.572.664-.919 0-.334-.117-.74-.349-1.066-.23-.325-.58-.593-1.043-.593zM12 21.529c-3.176 0-6.089-1.139-8.347-3.047l-3.45 1.206 1.251-3.393C.45 14.63 0 12.537 0 10.294 0 4.615 5.383 0 12 0s12 4.615 12 10.294c0 5.68-5.383 10.295-12 10.295-2.151 0-4.176-.321-5.988-.937zM6.883 14.37a.446.446 0 0 1 .175.348c0 .07-.023.186-.046.3-.023.116-.048.209-.048.302 0 .163.045.325.207.417.162.093.359.14.594.14.152 0 .317-.023.477-.069.161-.047.313-.094.453-.14.28-.094.513-.209.7-.348.187-.14.327-.278.42-.417.89-.118.166-.258.248-.427.08-.168.12-.34.12-.516 0-.33-.15-.645-.448-.868a1.61 1.61 0 0 0-.907-.324h-.047a2.378 2.378 0 0 0-.638.094c-.21.062-.42.14-.627.232-.209.093-.42.2-.63.31a7.526 7.526 0 0 0-.7.4 1.354 1.354 0 0 0-.259.186zM12 19.269c-3.042 0-5.861-1.137-7.973-3.003l-.635-.567-2.712.95.968-2.634-.644-.72c-1.339-1.49-2.077-3.406-2.077-5.428C-.073 5.693 5.382.538 12 .538s12.073 5.155 12.073 11.328c0 6.172-5.455 11.403-12.073 11.403z" />
+            </svg>
+            <div>
+                <h1 class="app-title">WhatsApp OTP Verification</h1>
+                <p class="app-subtitle">Verify your WhatsApp number with a one-time password</p>
+            </div>
+        </div>
+
+        <!-- API Documentation Link -->
+        <div class="text-center mb-4">
+            <a href="/swagger" target="_blank" class="btn btn-sm btn-outline-secondary">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                    class="bi bi-file-earmark-code" viewBox="0 0 16 16">
+                    <path
+                        d="M14 4.5V14a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2h5.5L14 4.5zm-3 0A1.5 1.5 0 0 1 9.5 3V1H4a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V4.5h-2z" />
+                    <path
+                        d="M8.646 6.646a.5.5 0 0 1 .708 0l2 2a.5.5 0 0 1 0 .708l-2 2a.5.5 0 0 1-.708-.708L10.293 9 8.646 7.354a.5.5 0 0 1 0-.708zm-1.292 0a.5.5 0 0 0-.708 0l-2 2a.5.5 0 0 0 0 .708l2 2a.5.5 0 0 0 .708-.708L5.707 9l1.647-1.646a.5.5 0 0 0 0-.708z" />
+                </svg>
+                API Documentation
+            </a>
+        </div>
+
+        <!-- Send OTP Card -->
+        <div class="card" id="sendOtpCard">
+            <div class="card-header">
+                Step 1: Send OTP to WhatsApp
+            </div>
+            <div class="card-body">
+                <form id="sendOtpForm">
+                    <div class="mb-3">
+                        <label for="whatsappNumber" class="form-label">WhatsApp Number (with country code)</label>
+                        <input type="text" class="form-control" id="whatsappNumber" placeholder="+919876543210"
+                            required>
+                        <div class="form-text">Enter your number with country code (e.g., +91 for India)</div>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">
+                        <span class="loading-spinner" id="sendOtpSpinner"></span>
+                        Send OTP to WhatsApp
+                    </button>
+                </form>
+                <div class="alert alert-success mt-3" id="sendSuccess" style="display: none;"></div>
+                <div class="alert alert-danger mt-3" id="sendError" style="display: none;"></div>
+            </div>
+        </div>
+
+        <!-- Verify OTP Card -->
+        <div class="card" id="verifyOtpCard" style="display: none;">
+            <div class="card-header">
+                Step 2: Verify OTP from WhatsApp
+            </div>
+            <div class="card-body">
+                <p>Please enter the 6-digit OTP sent to your WhatsApp number</p>
+
+                <form id="verifyOtpForm">
+                    <div class="otp-input-group justify-content-center">
+                        <input type="text" class="otp-input" maxlength="1" pattern="[0-9]" inputmode="numeric"
+                            autocomplete="one-time-code" required>
+                        <input type="text" class="otp-input" maxlength="1" pattern="[0-9]" inputmode="numeric"
+                            autocomplete="one-time-code" required>
+                        <input type="text" class="otp-input" maxlength="1" pattern="[0-9]" inputmode="numeric"
+                            autocomplete="one-time-code" required>
+                        <input type="text" class="otp-input" maxlength="1" pattern="[0-9]" inputmode="numeric"
+                            autocomplete="one-time-code" required>
+                        <input type="text" class="otp-input" maxlength="1" pattern="[0-9]" inputmode="numeric"
+                            autocomplete="one-time-code" required>
+                        <input type="text" class="otp-input" maxlength="1" pattern="[0-9]" inputmode="numeric"
+                            autocomplete="one-time-code" required>
+                    </div>
+
+                    <p class="text-center">OTP expires in <span id="countdownTimer">5:00</span></p>
+
+                    <button type="submit" class="btn btn-primary w-100">
+                        <span class="loading-spinner" id="verifyOtpSpinner"></span>
+                        Verify OTP
+                    </button>
+
+                    <div class="divider">or</div>
+
+                    <a id="resendBtn" class="d-block text-center mt-2">Resend OTP</a>
+                </form>
+                <div class="alert alert-success mt-3" id="verifySuccess" style="display: none;"></div>
+                <div class="alert alert-danger mt-3" id="verifyError" style="display: none;"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // DOM elements
+        const sendOtpForm = document.getElementById('sendOtpForm');
+        const verifyOtpForm = document.getElementById('verifyOtpForm');
+        const sendOtpCard = document.getElementById('sendOtpCard');
+        const verifyOtpCard = document.getElementById('verifyOtpCard');
+        const whatsappNumberInput = document.getElementById('whatsappNumber');
+        const sendSuccess = document.getElementById('sendSuccess');
+        const sendError = document.getElementById('sendError');
+        const verifySuccess = document.getElementById('verifySuccess');
+        const verifyError = document.getElementById('verifyError');
+        const resendBtn = document.getElementById('resendBtn');
+        const countdownTimer = document.getElementById('countdownTimer');
+        const sendOtpSpinner = document.getElementById('sendOtpSpinner');
+        const verifyOtpSpinner = document.getElementById('verifyOtpSpinner');
+        const otpInputs = document.querySelectorAll('.otp-input');
+
+        // API URL - will get replaced if running on Vercel
+        const API_BASE_URL = window.location.origin;
+
+        // Variables to store state
+        let whatsappNumber = '';
+        let countdownInterval;
+        let otpExpiryTime = 5 * 60; // 5 minutes in seconds
+
+        // Handle OTP input fields
+        otpInputs.forEach((input, index) => {
+            // Focus next input on keyup
+            input.addEventListener('keyup', (e) => {
+                if (e.key !== 'Backspace' && input.value && index < otpInputs.length - 1) {
+                    otpInputs[index + 1].focus();
+                }
+            });
+
+            // Focus previous input on backspace
+            input.addEventListener('keydown', (e) => {
+                if (e.key === 'Backspace' && !input.value && index > 0) {
+                    otpInputs[index - 1].focus();
+                }
+            });
+
+            // Only allow numbers
+            input.addEventListener('input', (e) => {
+                input.value = input.value.replace(/[^0-9]/g, '');
+            });
+        });
+
+        // Send OTP form submission
+        sendOtpForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            // Reset UI
+            sendSuccess.style.display = 'none';
+            sendError.style.display = 'none';
+
+            // Get WhatsApp number
+            whatsappNumber = whatsappNumberInput.value.trim();
+
+            // Basic validation
+            if (!whatsappNumber.startsWith('+')) {
+                sendError.textContent = 'WhatsApp number must start with + followed by country code';
+                sendError.style.display = 'block';
+                return;
+            }
+
+            try {
+                sendOtpSpinner.style.display = 'inline-block';
+
+                // Call API to send OTP
+                const response = await fetch(`${API_BASE_URL}/api/v1/auth/send-otp`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ whatsapp: whatsappNumber })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    // Show success message
+                    sendSuccess.textContent = data.message;
+                    sendSuccess.style.display = 'block';
+
+                    // Switch to verify OTP card
+                    sendOtpCard.style.display = 'none';
+                    verifyOtpCard.style.display = 'block';
+
+                    // Reset OTP inputs
+                    otpInputs.forEach(input => input.value = '');
+                    otpInputs[0].focus();
+
+                    // Start countdown timer
+                    startCountdown();
+
+                    // Enable resend button after 30 seconds
+                    setTimeout(() => {
+                        resendBtn.style.display = 'block';
+                    }, 30000);
+                } else {
+                    sendError.textContent = data.message || 'Failed to send OTP. Please try again.';
+                    sendError.style.display = 'block';
+                }
+            } catch (error) {
+                sendError.textContent = 'An error occurred. Please try again.';
+                sendError.style.display = 'block';
+                console.error('Error:', error);
+            } finally {
+                sendOtpSpinner.style.display = 'none';
+            }
+        });
+
+        // Verify OTP form submission
+        verifyOtpForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            // Reset UI
+            verifySuccess.style.display = 'none';
+            verifyError.style.display = 'none';
+
+            // Get OTP from input fields
+            const otp = Array.from(otpInputs).map(input => input.value).join('');
+
+            // Basic validation
+            if (otp.length !== 6 || !/^\d+$/.test(otp)) {
+                verifyError.textContent = 'Please enter a valid 6-digit OTP';
+                verifyError.style.display = 'block';
+                return;
+            }
+
+            try {
+                verifyOtpSpinner.style.display = 'inline-block';
+
+                // Call API to verify OTP
+                const response = await fetch(`${API_BASE_URL}/api/v1/auth/verify-otp`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        whatsapp: whatsappNumber,
+                        otp: otp
+                    })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    // Show success message
+                    verifySuccess.textContent = data.message;
+                    verifySuccess.style.display = 'block';
+
+                    // Stop countdown
+                    clearInterval(countdownInterval);
+
+                    // Disable form
+                    otpInputs.forEach(input => input.disabled = true);
+                    verifyOtpForm.querySelector('button').disabled = true;
+                    resendBtn.style.display = 'none';
+
+                    // Add button to start over
+                    const startOverBtn = document.createElement('button');
+                    startOverBtn.textContent = 'Verify Another Number';
+                    startOverBtn.className = 'btn btn-primary w-100 mt-3';
+                    startOverBtn.addEventListener('click', () => {
+                        location.reload();
+                    });
+                    verifyOtpCard.querySelector('.card-body').appendChild(startOverBtn);
+                } else {
+                    verifyError.textContent = data.message || 'Failed to verify OTP. Please try again.';
+                    verifyError.style.display = 'block';
+                }
+            } catch (error) {
+                verifyError.textContent = 'An error occurred. Please try again.';
+                verifyError.style.display = 'block';
+                console.error('Error:', error);
+            } finally {
+                verifyOtpSpinner.style.display = 'none';
+            }
+        });
+
+        // Resend OTP button click
+        resendBtn.addEventListener('click', async () => {
+            // Reset UI
+            verifySuccess.style.display = 'none';
+            verifyError.style.display = 'none';
+
+            try {
+                // Call API to resend OTP
+                const response = await fetch(`${API_BASE_URL}/api/v1/auth/send-otp`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ whatsapp: whatsappNumber })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    // Show success message
+                    verifySuccess.textContent = 'OTP resent successfully';
+                    verifySuccess.style.display = 'block';
+
+                    // Reset OTP inputs
+                    otpInputs.forEach(input => input.value = '');
+                    otpInputs[0].focus();
+
+                    // Restart countdown timer
+                    startCountdown();
+
+                    // Hide resend button for 30 seconds
+                    resendBtn.style.display = 'none';
+                    setTimeout(() => {
+                        resendBtn.style.display = 'block';
+                    }, 30000);
+                } else {
+                    verifyError.textContent = data.message || 'Failed to resend OTP. Please try again.';
+                    verifyError.style.display = 'block';
+                }
+            } catch (error) {
+                verifyError.textContent = 'An error occurred. Please try again.';
+                verifyError.style.display = 'block';
+                console.error('Error:', error);
+            }
+        });
+
+        // Start countdown timer
+        function startCountdown() {
+            // Clear any existing interval
+            if (countdownInterval) {
+                clearInterval(countdownInterval);
+            }
+
+            // Reset OTP expiry time (5 minutes)
+            otpExpiryTime = 5 * 60;
+
+            // Update timer display
+            updateTimerDisplay();
+
+            // Start interval
+            countdownInterval = setInterval(() => {
+                otpExpiryTime--;
+
+                if (otpExpiryTime <= 0) {
+                    // Stop countdown
+                    clearInterval(countdownInterval);
+
+                    // Show expired message
+                    verifyError.textContent = 'OTP has expired. Please request a new one.';
+                    verifyError.style.display = 'block';
+
+                    // Ensure resend button is visible
+                    resendBtn.style.display = 'block';
+                }
+
+                updateTimerDisplay();
+            }, 1000);
+        }
+
+        // Update timer display
+        function updateTimerDisplay() {
+            const minutes = Math.floor(otpExpiryTime / 60);
+            const seconds = otpExpiryTime % 60;
+            countdownTimer.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+        }
+    </script>
+</body>
+
+</html>

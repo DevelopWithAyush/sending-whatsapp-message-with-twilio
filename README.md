@@ -11,6 +11,7 @@ A Node.js backend that implements OTP verification via WhatsApp using Twilio's W
 - **MongoDB** with Mongoose for data storage
 - **Twilio** for WhatsApp messaging
 - **Swagger** for API documentation
+- **HTML/CSS/JS** for a simple user interface
 
 ## 🚀 Getting Started
 
@@ -44,6 +45,7 @@ A Node.js backend that implements OTP verification via WhatsApp using Twilio's W
    TWILIO_AUTH_TOKEN=your_twilio_auth_token
    TWILIO_WHATSAPP_NUMBER=whatsapp:+14155238886
    OTP_EXPIRY_MINUTES=5
+   BASE_URL=http://localhost:5000
    ```
 
 4. Start the server
@@ -56,7 +58,20 @@ A Node.js backend that implements OTP verification via WhatsApp using Twilio's W
    npm start
    ```
 
-5. Access the API documentation at [http://localhost:5000/api-docs](http://localhost:5000/api-docs)
+5. Access the web interface at [http://localhost:5000](http://localhost:5000)
+
+6. Access the API documentation at [http://localhost:5000/api-docs](http://localhost:5000/api-docs)
+
+## 📱 User Interface
+
+The system includes a simple web interface that allows users to:
+
+1. Enter their WhatsApp number
+2. Receive an OTP via WhatsApp
+3. Enter and verify the OTP
+4. Request a new OTP if needed
+
+The interface is mobile-friendly and styled with a WhatsApp-inspired theme.
 
 ## 🔧 API Endpoints
 
@@ -164,6 +179,7 @@ This application is configured for easy deployment on Vercel. Follow these steps
      - `TWILIO_AUTH_TOKEN` - Your Twilio Auth Token
      - `TWILIO_WHATSAPP_NUMBER` - Your Twilio WhatsApp number (with whatsapp: prefix)
      - `OTP_EXPIRY_MINUTES` - How long OTPs should remain valid (default: 5)
+     - `BASE_URL` - Your Vercel deployment URL (e.g., https://your-app.vercel.app)
 
 5. **Redeployment**
 
@@ -174,6 +190,7 @@ This application is configured for easy deployment on Vercel. Follow these steps
    - The app is optimized for serverless environments
    - MongoDB connections are handled efficiently to work within Vercel's constraints
    - Swagger documentation will be available at `<your-vercel-url>/api-docs`
+   - Web interface will be available at your Vercel domain root
 
 ## 📋 License
 

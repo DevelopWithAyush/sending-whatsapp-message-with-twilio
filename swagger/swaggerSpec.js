@@ -17,8 +17,8 @@ const options = {
         },
         servers: [
             {
-                url: `${process.env.BASE_URL}`,
-                description: 'Development server',
+                url: '/',
+                description: 'Current environment',
             },
         ],
     },
