@@ -37,22 +37,43 @@ class OtpController {
                 expiresAt
             });
 
-            // Prepare the message
-            const message = `Your OTP for WhatsApp verification is: ${otp}. Valid for ${expiryMinutes} minutes.`;
+            // Prepare the message - using a simplified format for better WhatsApp compliance
+            const message = `Your verification code is: ${otp}`;
 
-            // Send the OTP via WhatsApp
-            await whatsappService.sendWhatsappMessage(whatsapp, message);
+            // Log attempt to send message
+            console.log(`Attempting to send OTP to ${whatsapp}`);
 
-            return res.status(200).json({
-                status: 'success',
-                message: 'OTP sent to WhatsApp'
-            });
+            try {
+                // Send the OTP via WhatsApp
+                const result = await whatsappService.sendWhatsappMessage(whatsapp, message);
+                console.log('Twilio message sent successfully:', result.sid);
+
+                return res.status(200).json({
+                    status: 'success',
+                    message: 'OTP sent to WhatsApp'
+                });
+            } catch (twilioError) {
+                // Log detailed Twilio error
+                console.error('Twilio Error Details:', JSON.stringify({
+                    code: twilioError.code,
+                    status: twilioError.status,
+                    message: twilioError.message,
+                    moreInfo: twilioError.moreInfo,
+                    detail: twilioError.detail
+                }, null, 2));
+
+                return res.status(500).json({
+                    status: 'error',
+                    message: 'Failed to send OTP via WhatsApp. Please make sure you have sent a message to our WhatsApp number first.',
+                    twilioError: process.env.NODE_ENV === 'development' ? twilioError.message : null
+                });
+            }
 
         } catch (error) {
-            console.error('Error sending OTP:', error);
+            console.error('Error in OTP generation process:', error);
             return res.status(500).json({
                 status: 'error',
-                message: 'Failed to send OTP',
+                message: 'Failed to generate and store OTP',
                 error: process.env.NODE_ENV === 'development' ? error.message : null
             });
         }

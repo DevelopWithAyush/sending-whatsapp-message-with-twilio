@@ -178,6 +178,12 @@
                 Step 1: Send OTP to WhatsApp
             </div>
             <div class="card-body">
+                <div class="alert alert-info mb-3">
+                    <strong>Important:</strong> Before receiving an OTP, you must first send a message to our WhatsApp
+                    number
+                    <a href="https://wa.me/14155238886" target="_blank">+14155238886</a>. This is required by WhatsApp's
+                    policy.
+                </div>
                 <form id="sendOtpForm">
                     <div class="mb-3">
                         <label for="whatsappNumber" class="form-label">WhatsApp Number (with country code)</label>
@@ -336,11 +342,19 @@
                         resendBtn.style.display = 'block';
                     }, 30000);
                 } else {
-                    sendError.textContent = data.message || 'Failed to send OTP. Please try again.';
+                    // Format the error message to be more user-friendly
+                    let errorMessage = data.message || 'Failed to send OTP. Please try again.';
+
+                    // Add specific advice for common errors
+                    if (errorMessage.includes('opted in') || errorMessage.includes('first')) {
+                        errorMessage += ' Please message our WhatsApp number first at +14155238886 to enable OTP service.';
+                    }
+
+                    sendError.innerHTML = errorMessage;
                     sendError.style.display = 'block';
                 }
             } catch (error) {
-                sendError.textContent = 'An error occurred. Please try again.';
+                sendError.textContent = 'Network or server error. Please check your connection and try again.';
                 sendError.style.display = 'block';
                 console.error('Error:', error);
             } finally {
